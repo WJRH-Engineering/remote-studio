@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# run the generate script
+./generate.py
+
+# build the full icecast config from the
+# template and the generated mounts
+touch icecast/config.xml
+cat icecast/template_config.xml > icecast/config.xml
+cat icecast/mounts.xml >> icecast/config.xml
+echo '</icecast>' >> icecast/config.xml
+# copy the new config file into correct place
+cp icecast/config.xml /etc/icecast2/icecast.xml
+
+# restart the icecast server
+systemctl restart icecast2
+
+# copy liquidsoap files into correct directory
+mkdir -p /usr/src/remote_studio
+chmod +x liq/main.liq
+
+cp liq/main.liq /usr/src/remote_studio
+cp liq/sources.liq /usr/src/remote_studio
+cp liq/switch.liq /usr/src/remote_studio
+cp liq/passwords.liq /usr/src/remote_studio
+
+# copy liquidsoap service file into correct directory
+cp liq/remote_studio.service /etc/systemd/system/remote_studio.service
+systemctl enable remote_studio
+systemctl restart remote_studio

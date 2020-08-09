@@ -3,6 +3,9 @@
 import csv
 import sys
 
+import random
+import string
+
 # clear files
 mounts = open('icecast/mounts.xml', 'w')
 mounts.write('')
@@ -17,7 +20,7 @@ sources = open('liq/sources.liq', 'a')
 switch = open('liq/switch.liq', 'w')
 switch.write('active = switch([\n')
 switch.close()
-switch = open('switch.liq', 'a')
+switch = open('liq/switch.liq', 'a')
 
 mount_template = '''\
 <mount>
@@ -36,15 +39,16 @@ source_template = '''\
 '''
 
 def generate_password():
-	return "password"
+		chars = string.ascii_uppercase + string.ascii_lowercase + string.digits
+		size = 8
+		return ''.join(random.choice(chars) for x in range(size, 20))
 
 
 # Read existing password combinations from file
-password_file = csv.reader(open("passwords.csv", "w+"))
+password_file = csv.reader(open("passwords.csv", "r+"))
 passwords = {}
 for mountpoint, password in password_file:
 	passwords[mountpoint] = password
-	print(len(password))
 	
 
 new_passwords = []
@@ -60,15 +64,6 @@ def get_password(name):
 		new_passwords.append((name, new_password))
 		return new_password
 
-	# if passwords[name] and len(passwords[name]) > 0:
-	# 	return passwords[name]
-	# else:
-	# 	new_password = generate_password()
-	# 	new_passwords.append(new_password)
-	# 	return new_password
-
-
-
 with open('data.csv', newline='') as csvfile:
 	parser = csv.reader(csvfile, delimiter=',')
 	next(parser) # discard the first row
@@ -81,13 +76,15 @@ with open('data.csv', newline='') as csvfile:
 		# Generate Icecast mountpoint
 		mount_string = mount_template.format(name, password)
 		mounts.write(mount_string)
+
+		safename = name.replace('-','_')
 	
 		# Generate Liquidsoap source
-		source_string = source_template.format(name, name)
+		source_string = source_template.format(safename, name)
 		sources.write(source_string)
 
 		# Generate row in Liquidsoap switch statement
-		switch_string = '\t({{ {}-{} }}, {}),\n'.format(start_time, end_time, name)
+		switch_string = '\t({{ {}-{} }}, {}),\n'.format(start_time, end_time, safename)
 		switch.write(switch_string)
 
 

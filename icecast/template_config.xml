@@ -242,7 +242,5 @@
         -->
     </security>
 
-	<!-- The auto generated mounts will go here -->
-	<!-- {{mounts}} -->
-
-</icecast>
+<!-- The auto generated mounts will go here -->
+<!-- omit the last tag, it will  be inserted automatically -->

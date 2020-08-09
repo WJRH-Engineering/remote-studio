@@ -1,0 +1,12 @@
+[Unit]
+Description=liquid soap daemon
+After=network.target
+
+[Service]
+User=wjrh
+ExecStart=/usr/src/remote_studio/main.liq
+Restart=always
+WorkingDirectory=/usr/src/remote_studio
+
+[Install]
+WantedBy=mulit-user.target
