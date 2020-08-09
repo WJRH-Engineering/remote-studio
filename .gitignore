@@ -3,7 +3,7 @@ liq/switch.liq
 liq/passwords.liq
 
 icecast/mounts.xml
-icecast/generated_config.xml
+icecast/config.xml
 
 data.csv
 passwords.csv
