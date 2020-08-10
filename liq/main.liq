@@ -1,11 +1,13 @@
 #!/usr/bin/liquidsoap
 
-# sources.liq and switch.liq are auto-generated
-# by the generate.py script
-%include "sources.liq"
-%include "switch.liq"
+set("harbor.bind.addr", "0.0.0.0")
 
-output = mksafe(active)
+# live = input.harbor("dev-test", port=8000, password="xxx")
+
+active = mksafe(sine(440.0))
+output = fallback([live, active])
+
+output = active
 
 output.icecast(%mp3,
 	host="remote.wjrh.org",
@@ -15,6 +17,6 @@ output.icecast(%mp3,
 	description="Remote Studio stream for WJRH",
 	genre="College Radio",
 	url="wjrh.org",
-	mount="remote-studio",
+	mount="development",
 	output
 )
