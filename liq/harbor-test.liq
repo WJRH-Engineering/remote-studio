@@ -2,6 +2,7 @@
 
 set("harbor.bind.addr", "0.0.0.0")
 
+live = input.harbor("test-harbor", port=8000, password="xxx")
 live = input.harbor("dev-test", port=8000, password="xxx")
 
 #s1 = sine() #default freq=440
