@@ -1,6 +1,6 @@
 #!usr/bin/liquidsoap
 
-source_config = file.contents("source-config.json")
+source_config = file.contents("sources.json")
 
 %include "passwords.liq"
 
