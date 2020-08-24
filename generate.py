@@ -61,10 +61,10 @@ for shortname, password, mountpoint in mounts:
 conn.commit()
 
 # clear json mounts file
-mountfile = open('liq/mounts.json', 'w')
+mountfile = open('/etc/liquidsoap/sources.json', 'w')
 mountfile.write('')
 mountfile.close()
-mountfile = open('liq/mounts.json', 'a')
+mountfile = open('/etc/liquidsoap/sources.json', 'a')
 
 # Join mounts and schedule table to get data needed for 
 # JSON file generation
