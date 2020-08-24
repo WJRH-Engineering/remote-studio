@@ -57,19 +57,6 @@ def parse_time_string(s) =
 
 end
 
-print("2w3h-3w4h")
-print(parse_time_string("2w3h-3w4h"))
-
-
-print("2w3h4m6s")
-print(parse_time_string("2w3h4m6s"))
-
-
-print("2w3h4")
-print(parse_time_string("2w3h4"))
-
-#output.dummy(noise())
-
 # savonet/liquidsoap/src/lang/lang_parser.mly 
 # (** Time intervals *)
 
@@ -93,16 +80,6 @@ def date(time_list) =
     end      
     fst(list.fold(list_to_sec, (0, list.tl(time_units)), time_list)) 
 end
-
-
-
-print("\n")
-print(date(["","","","2"])) # 2 * 1 = 2
-print(date(["","","2",""])) # 2*60 = 120
-print(date(["","2","",""])) # 2*60*60 = 7200
-print(date(["2","","",""])) # 2 mod 7 * 24*60*60 = 172,800
-print(date(["7","","1",""])) # 7 mod 7 + 1*60 = 60
-print("\n")
 
 #(** Give the index of the first non-None value in the list. *)
 def last_index(l) =
@@ -165,60 +142,6 @@ def mk_time_pred(a,b,c) =
 	time_in_mod(a,b,c)
 end
 
-print("\n")
-print("1st non-none index")
-print(last_index(["","","","1"])) # 3
-print(last_index(["","","1","1"])) # 2
-print(last_index(["","1","1","1"])) # 1
-print(last_index(["1","1","1","1"])) # 0
-print(last_index(["","","","1"])) # 3
-print(last_index(["","","1",""])) # 2
-print(last_index(["","1","",""])) # 1
-print(last_index(["1","","",""])) # 0
-print(last_index(["1","1","1","1"])) # 0
-print(last_index(["1","1","1",""])) # 0
-print(last_index(["1","1","",""])) # 0
-print(last_index(["1","","",""])) # 0
-
-print("\n")
-print("PRECISION - MOD VALUE to get that precision")
-# liquidsoap def - the precision of Xs is 1, XmYs is 60, XhYmZs 3600,
-print(precision(["","","","1"])) # index 3 - time unit 60 - (liq def precision 1)
-print(precision(["","","1","1"])) # index 2 - time unit 60*60 = 3600 - (liq def precision 60)
-print(precision(["","1","1","1"])) # index 1 - time unit 24*60*60 = 86400 - (liq def precision 3600)
-print(precision(["1","1","1","1"])) # index 0 - time unit 7*24*60*60 = 604800 -(liq def precision 24*60*60)
-print(precision(["","","","1"])) # index 3 - time unit 60
-print(precision(["","","1",""])) # index 2 - time unit 3600
-print(precision(["","1","",""])) # index 1 - time unit 86400
-print(precision(["1","","",""])) # index 0 - time unit 604800
-print(precision(["1","1","1","1"])) # index 3 - time unit 604800 
-print(precision(["1","1","1",""])) # index 3 - time unit 604800 
-print(precision(["1","1","",""])) # index 3 - time unit 604800
-print(precision(["1","","",""])) # index 3 - time unit 604800
-
-print("\n")
-print("DURATION")
-# liquidsoap def - duration of Xs is 1, Xm 60, XhYm 60,
-print(duration(["","","","1"])) # index 0 -> 4 time unit 1
-print(duration(["","","1","1"])) # index 0 -> 4 time unit 1
-print(duration(["","1","1","1"])) # index 0 -> 4 time unit 1
-print(duration(["1","1","1","1"])) # index 0 -> 4 time unit 1
-print(duration(["","","","1"])) # index 0 -> 4 time unit 1
-print(duration(["","","1",""])) # index 1 -> 3 time unit 60
-print(duration(["","1","",""])) # index 2 -> 2 time unit 60*60 = 3600
-print(duration(["1","","",""])) # index 3 -> 1 time unit 24*60*60 = 864800
-print(duration(["1","1","1","1"])) # index 0 -> 4 time unit 1 
-print(duration(["1","1","1",""])) # index 1 -> 3 time unit 60 
-print(duration(["1","1","",""])) # index 2 -> 2 time unit 60*60 = 3600
-print(duration(["1","","",""])) # index 3 -> 1 time unit 24*60*60 = 864800
-
-w = mk_time_pred(16*60*60+24*60,16*60*60+25*60,7*24*60*60)
-# w = random.bool
-print(w)
-print(w())
-sleep(5.0)
-print(w())
-
 def time_string_to_func(s) =
 	ret = parse_time_string(s)
 	t = ref []
@@ -231,11 +154,7 @@ def time_string_to_func(s) =
 end
 
 
-
-
-
 # See if the source is already created in the dyn_sources
-
 def make_source(ret, current_element) =
 	# ret is (dyn_sources, source_times)
 	dyn_src = ref fst(ret)
