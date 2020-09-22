@@ -1,30 +1,19 @@
 #!/bin/bash
 
-# run the generate script
-./generate.py
+# Make a new user and work directory for the daemon to use
+mkdir -p /etc/liquidsoap
+useradd liquidsoap_daemon
 
-# build the full icecast config from the
-# template and the generated mounts
-touch icecast/config.xml
-cat icecast/template_config.xml > icecast/config.xml
-cat icecast/mounts.xml >> icecast/config.xml
-echo '</icecast>' >> icecast/config.xml
-# copy the new config file into correct place
-cp icecast/config.xml /etc/icecast2/icecast.xml
+# give the the new user ownership of the work directory
+chown -R liquidsoap_daemon /etc/liquidsoap
 
-# restart the icecast server
-systemctl restart icecast2
+# copy liquidsoap source code into work directory
+cp liquidsoap/main.liq /etc/liquidsoap/main.liq
+cp liquidsoap/passwords.liq /etc/liquidsoap/passwords.liq
 
-# copy liquidsoap files into correct directory
-mkdir -p /usr/src/remote_studio
-chmod +x liq/main.liq
+# copy service file into /etc/systemd/system
+cp servicefile /etc/systemd/system/remote_studio.service
 
-cp liq/main.liq /usr/src/remote_studio
-cp liq/sources.liq /usr/src/remote_studio
-cp liq/switch.liq /usr/src/remote_studio
-cp liq/passwords.liq /usr/src/remote_studio
-
-# copy liquidsoap service file into correct directory
-cp liq/remote_studio.service /etc/systemd/system/remote_studio.service
+# enable and start daemon
 systemctl enable remote_studio
 systemctl restart remote_studio

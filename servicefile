@@ -1,0 +1,12 @@
+[Unit]
+Description=liquid soap daemon
+After=network.target
+
+[Service]
+User=liquidsoap_daemon
+ExecStart=/etc/liquidsoap/main.liq
+Restart=always
+WorkingDirectory=/etc/liquidsoap
+
+[Install]
+WantedBy=mulit-user.target
