@@ -1,0 +1,3 @@
+[submodule "liquidsoap/liquidsoap-utils"]
+	path = liquidsoap/liquidsoap-utils
+	url = https://github.com/WJRH-Engineering/liquidsoap-utils.git

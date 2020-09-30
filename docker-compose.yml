@@ -1,6 +1,13 @@
 version: '2.0'
 services:
 
+  # initialize the state of each container or reset the state of the system,
+  # specificially the liquidsoap and redis containers. Built from information
+  # stored in the api.wjrh.org database
+  init:
+    build: ./init
+    depends_on: [liquidsoap, redis, icecast]
+
   redis:
     image: redis:latest
     ports:
@@ -10,8 +17,6 @@ services:
   # publish requests to the rtmp server
   auth:
     build: "./auth"
-    ports:
-      - 1980:80
     depends_on: [redis]
   
   # an nginx server with the rtmp module responsible for hosting rtmp streams
@@ -24,21 +29,23 @@ services:
       - 1935:1935
     volumes:
       - "./nginx/nginx.conf:/etc/nginx/nginx.conf.template"
-    depends_on: [auth, redis]
+    depends_on: [auth, redis, icecast]
 
   # the icecast server
-  # icecast:
-  #   build: ./icecast
-  #   ports:
-  #     - 8000:8000
-  #   volumes:
-  #     - "./icecast/icecast.xml:/etc/icecast2/icecast.xml"
+  icecast:
+    build: ./icecast
+    ports:
+      - 8000:8000
+    volumes:
+      - "./icecast/config/icecast.xml:/etc/icecast2/icecast.xml"
 
   liquidsoap:
     build: https://github.com/radiorabe/docker-liquidsoap.git
     environment: ['TZ=America/New_York']
     volumes:
       - "./liquidsoap/src:/var/lib/liquidsoap"
+      - "./liquidsoap/libs:/var/lib/liquidsoap/libs"
     command: "main.liq"
     ports:
-      - 9000:9000
+      - 1234:1234
+    depends_on: [icecast]
