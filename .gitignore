@@ -5,5 +5,7 @@ liq/passwords.liq
 icecast/mounts.xml
 icecast/generated_config.xml
 
+secrets/
+
 data.csv
 passwords.csv

@@ -1,1 +1,0 @@
-icecast_password="hackme"
