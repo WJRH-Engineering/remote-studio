@@ -3,7 +3,12 @@ liq/switch.liq
 liq/passwords.liq
 
 icecast/mounts.xml
-icecast/config.xml
+icecast/generated_config.xml
+
+*/__pycache__
+init/.pgpass
+
+secrets/
 
 data.csv
 passwords.csv

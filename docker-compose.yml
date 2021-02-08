@@ -1,0 +1,56 @@
+version: '3.0'
+services:
+
+  # initialize the state of each container or reset the state of the system,
+  # specificially the liquidsoap and redis containers. Built from information
+  # stored in the api.wjrh.org database
+  init:
+    build: ./init
+    depends_on: [liquidsoap, redis, icecast]
+    volumes:
+      - "./init:/home/init/"
+      - "./secrets/.pgpass:/home/init/.pgpass"
+
+
+  redis:
+    image: redis:latest
+    ports:
+      - 6379:6379
+
+  # the auth service is a nodejs/express web app responsible for authorizing
+  # publish requests to the rtmp server
+  auth:
+    build: "./auth"
+    depends_on: [redis]
+  
+  # an nginx server with the rtmp module responsible for hosting rtmp streams
+  # from remote djs. It is also responsible for invoking ffmpeg whenever a
+  # stream is created to transcode into mp3 and publish to the icecast server
+  rtmp:
+    image: "alfg/nginx-rtmp"
+    ports:
+      - 1935:1935
+    volumes:
+      - "./nginx/nginx.conf:/etc/nginx/nginx.conf.template"
+    depends_on: [auth, redis, icecast]
+
+  # the icecast server
+  icecast:
+    image: api.wjrh.org:5000/icecast:latest
+    ports:
+      - 8000:8000
+    volumes:
+      - "./icecast/icecast.xml:/etc/icecast2/icecast.xml"
+
+  liquidsoap:
+    image: savonet/liquidsoap:master
+    environment: ['TZ=America/New_York']
+    volumes:
+      - "./liquidsoap/main.liq:/src/main.liq"
+      - "./liquidsoap/timestring.liq:/src/timestring.liq"
+      - "./liquidsoap/config.liq:/src/config.liq"
+      - "./secrets:/secrets"
+    command: ["/src/main.liq"]
+    ports:
+      - 1234:1234
+    depends_on: [icecast]
