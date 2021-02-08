@@ -34,8 +34,8 @@ def now() =
 	now.wday*24*60*60 + now.hour*60*60 + now.min*60 + now.sec
 
 	# localtime(time(),
-	# 	fun(~sec, ~min, ~hour, ~mday, ~mon, ~year, ~wday, ~yday, ~isdst)
-	# 	-> wday*24*60*60 + hour*60*60 + min*60 + sec
+	#	fun(~sec, ~min, ~hour, ~mday, ~mon, ~year, ~wday, ~yday, ~isdst)
+	#	-> wday*24*60*60 + hour*60*60 + min*60 + sec
 	# )
 end
 
