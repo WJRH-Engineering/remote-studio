@@ -16,7 +16,7 @@ auth_table = "mountpoints"
 
 [[timeslot]]
 shortname = "black-coffee"
-time = "1w0h-8w1h"
+time_range = "1w0h-8w1h"
 
 [liquidsoap]
 input_server = "api.wjrh.org"

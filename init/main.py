@@ -1,9 +1,16 @@
 #!/usr/bin/python3
 
-from telnetlib import Telnet
-import redis
-import toml
 
+# -----------	
+# INIT SCRIPT
+# -----------	
+# The 
+#
+
+from telnetlib import Telnet
+from redis import Redis
+
+import toml
 import string
 import random
 
@@ -18,7 +25,7 @@ def generate_password():
 	size = 5
 	return ''.join(random.choice(chars) for x in range(0, size))
 
-def setup_mounts_table():
+def setup_auth_table():
 	sql.run("autofill-shows")
 	sql.run("autofill-mountpoints")
 
@@ -29,7 +36,6 @@ def setup_mounts_table():
 
 
 def get_schedule():
-
 	# get the timeslots from the schedule table
 	season = config.get("schedule").get("season")
 	year = config.get("schedule").get("year")
@@ -41,7 +47,7 @@ def get_schedule():
 	# add any extra timeslots that may be included in the config file
 	for timeslot in config.get("timeslot"):
 		timeslot['mountpoint'] = timeslot['shortname']
-		if not timeslot['password']:
+		if not timeslot.get("password", None):
 			timeslot['password'] = sql.select("password", [timeslot.get("shortname")])
 
 		output.append(timeslot)
@@ -51,28 +57,41 @@ def get_schedule():
 def init_streaming_server():
 	print("connecting to liquidsoap")
 
-	# server = Telnet('liquidsoap', 1234)
+	server = Telnet('liquidsoap', 1234)
+	redis = Redis('redis', 6379)
 
-	# def write(command):
-	#	server.write(command.encode('utf-8'))
-	#	server.write("\n")
-	#	server.read_until(b'OK')
+	def write(command):
+		server.write(command.encode('utf-8'))
+		server.write(b"\n")
+		server.read_until(b'OK')
+
+	def close():
+		server.write(b"exit\n")
+		server.read_until(b"Bye!")
+		server.close()
 	
 	def setpassword(shortname, password):
-		r.sadd('auth-tokens', '{}:{}'.format(shortname, password))
+		redis.sadd('auth-tokens', '{}:{}'.format(shortname, password))
 
 	for timeslot in get_schedule():
-		timestring = sql.timestring(timeslot.get("time_range"))
-		print(f'timeslot.add {timeslot.get("mountpoint")} {timestring}')
-		# write(f'timeslot.add {timeslot.get("mountpoint")} {timestring}')
+		timestring = timeslot.get("time_range")
+		write(f'timeslot.add {timeslot.get("mountpoint")} {timestring}')
+		setpassword(timeslot.get("shortname"), timeslot.get("password"))
+
+	# send config commands
+	liquidsoap = config.get("liquidsoap")
+	write(f"config.set input.server {liquidsoap.get('input_server')}")
+	write(f"config.set input.port {liquidsoap.get('input_port')}")
+	write(f"config.set output.server {liquidsoap.get('output_server')}")
+	write(f"config.set output.port {liquidsoap.get('output_port')}")
 
 	print("finished adding timeslots")
 	print("sending start signal")
-	# write('start')
-	# server.close()
+	write('start')
+	close()
 	print("connection closed")
 
-setup_mounts_table()
+setup_auth_table()
 init_streaming_server()
 
 

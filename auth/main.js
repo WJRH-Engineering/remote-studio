@@ -27,7 +27,7 @@ app.post('/auth_rtmp', async function(req, res){
 })
 
 app.post('/auth_icecast', async function(req, res){
-	console.log(req.body)
+	// console.log(req.body)
 	try {
 		mountpoint = req.body.mount.replace('/','')
 		password = req.body.pass

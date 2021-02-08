@@ -10,9 +10,12 @@ import psycopg2 as pg
 conn = pg.connect(f"user={config['user']} dbname={config['database']} host={config['hostname']}")
 cursor = conn.cursor()
 
+# schema defenitions correspond to select statements defined below, not
+# necessarily to tables in the database
 schema = {
 	"mounts": ["shortname", "password", "mountpoint"],
 	"schedule": ["shortname", "time_range", "year", "season", "mountpoint", "password"],
+	"password": ["password"],
 }
 
 selects = {
