@@ -1,20 +1,16 @@
-FROM debian:latest
-RUN apt-get update 
-RUN apt-get install -y icecast2
+from alpine:latest
+run apk add --no-cache icecast
 
-RUN useradd icecastd
-RUN chown -R icecastd /var/log/icecast2
-RUN chown -R icecastd /etc/icecast2
+copy ./icecast.xml /etc/icecast2/icecast.xml
 
-EXPOSE 8000
+run adduser -D icecastd
+run mkdir -p /var/log/icecast2/ && mkdir -p /etc/icecast2
+run chown -R icecastd /var/log/icecast2
+run chown -R icecastd /etc/icecast2
+run chown -R icecastd /usr/share/icecast
 
-# INIT Python script
-RUN apt-get -y install python
-RUN apt-get -y install python-pip
-RUN pip install redis
+user icecastd
 
-COPY . .
+expose 8000
 
-# CMD python init.py && icecast2 -c /etc/icecast2/icecast.xml
-CMD icecast2 -c /etc/icecast2/icecast.xml
-# CMD cat /etc/icecast2/icecast.xml
+cmd icecast -c /etc/icecast2/icecast.xml
