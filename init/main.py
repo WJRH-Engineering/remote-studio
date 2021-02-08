@@ -1,89 +1,78 @@
 #!/usr/bin/python3
 
-import csv
-import sys
-
-import random
-import string
-
-import psycopg2 as pg
-import redis
 from telnetlib import Telnet
+import redis
+import toml
 
-r = redis.Redis(host='redis', port=6379)
-conn = pg.connect("user = 'wjrh' dbname = 'testdb' host = 'api.wjrh.org' password='hogghall'")
-cursor = conn.cursor()
+import string
+import random
 
-# Helper functions
+import sql
+
+config = toml.load("./config.toml")
+print(config)
+
+
 def generate_password():
 	chars = string.ascii_uppercase 
 	size = 5
-	return ''.join(random.choice(chars) for x in range(0, 5))
+	return ''.join(random.choice(chars) for x in range(0, size))
 
-def generate_time_expression(sql_time_range):
-	return '{}w{}h{}m{}s-{}w{}h{}m{}s'.format(
-		sql_time_range.lower.day,
-		sql_time_range.lower.hour,
-		sql_time_range.lower.minute,
-		sql_time_range.lower.second,
-		sql_time_range.upper.day,
-		sql_time_range.upper.hour,
-		sql_time_range.upper.minute,
-		sql_time_range.upper.second
-	)
+def setup_mounts_table():
+	sql.run("autofill-shows")
+	sql.run("autofill-mountpoints")
 
-# Update mounts table to include all unique program shortname
-cursor.execute("""
-INSERT INTO mounts (shortname)
-SELECT DISTINCT shortname FROM schedule
-ON CONFLICT DO NOTHING;
-""")
-conn.commit()
+	for row in sql.select("mounts"):
+		if row.get("password") == None:
+			print(f"generating password for {row.get('shortname')}")
+			sql.run("set-password", [generate_password(), row.get("shortname") ])
 
-# Generate passwords and mountpoint urls for mount entries without them
-cursor.execute("""
-SELECT shortname, password, mountpoint
-FROM mounts;
-""")
 
-rows = cursor.fetchall()
-mounts = []
-for shortname, password, mountpoint in rows:
-	new_shortname = shortname
-	new_password = password or generate_password()
-	new_mountpoint = mountpoint or shortname
-	mounts.append((new_shortname, new_password, new_mountpoint))
+def get_schedule():
 
-for shortname, password, mountpoint in mounts:
-	cursor.execute("""
-	UPDATE mounts
-	SET password = %s, mountpoint = %s
-	WHERE shortname = %s;
-	""", (password, mountpoint, shortname))
+	# get the timeslots from the schedule table
+	season = config.get("schedule").get("season")
+	year = config.get("schedule").get("year")
+	output = sql.select("schedule", [year, season])
+
+	for timeslot in output:
+		timeslot["time_range"] = sql.timestring(timeslot["time_range"])
+
+	# add any extra timeslots that may be included in the config file
+	for timeslot in config.get("timeslot"):
+		timeslot['mountpoint'] = timeslot['shortname']
+		if not timeslot['password']:
+			timeslot['password'] = sql.select("password", [timeslot.get("shortname")])
+
+		output.append(timeslot)
+
+	return output
+
+def init_streaming_server():
+	print("connecting to liquidsoap")
+
+	# server = Telnet('liquidsoap', 1234)
+
+	# def write(command):
+	#	server.write(command.encode('utf-8'))
+	#	server.write("\n")
+	#	server.read_until(b'OK')
 	
-conn.commit()
+	def setpassword(shortname, password):
+		r.sadd('auth-tokens', '{}:{}'.format(shortname, password))
 
-# Join mounts and schedule table to get data needed for 
-# JSON file generation
-cursor.execute("""
-SELECT schedule.shortname, time_range, password, mountpoint
-FROM schedule
-LEFT JOIN mounts
-ON schedule.shortname = mounts.shortname;
-""")
-rows = cursor.fetchall()
+	for timeslot in get_schedule():
+		timestring = sql.timestring(timeslot.get("time_range"))
+		print(f'timeslot.add {timeslot.get("mountpoint")} {timestring}')
+		# write(f'timeslot.add {timeslot.get("mountpoint")} {timestring}')
 
-tn = Telnet('liquidsoap', 1234)
-for name, time, password, mountpoint in rows:
-    # add the name, password pair to the auth server
-    r.sadd('auth-tokens', '{}:{}'.format(name, password))
+	print("finished adding timeslots")
+	print("sending start signal")
+	# write('start')
+	# server.close()
+	print("connection closed")
 
-    # add the name, timeslot pair to the liquidsoap server
-    timestring = generate_time_expression(time)
-    tn.write('add-timeslot {} {} \n'.format(name, timestring).encode('utf-8'))
-    tn.read_until(b'OK')
+setup_mounts_table()
+init_streaming_server()
 
-# tell the liquidsoap server to begin
-tn.write(b'start \n')
-tn.read_until(b'OK')
-tn.close()
+

@@ -1,16 +1,6 @@
 <icecast>
-    <!-- location and admin are two arbitrary strings that are e.g. visible
-         on the server info page of the icecast web interface
-         (server_version.xsl). -->
-    <location>MARS</location>
-    <admin>icemaster@localhost</admin>
-
-    <!-- IMPORTANT!
-         Especially for inexperienced users:
-         Start out by ONLY changing all passwords and restarting Icecast.
-         For detailed setup instructions please refer to the documentation.
-         It's also available here: http://icecast.org/docs/
-    -->
+    <location>Easton, PA</location>
+    <admin>WJRH</admin>
 
     <limits>
         <clients>100</clients>
@@ -25,7 +15,7 @@
              it also significantly increases latency between the source
              client and listening client.  For low-latency setups, you
              might want to disable this. -->
-        <burst-on-connect>0</burst-on-connect>
+        <burst-on-connect>1</burst-on-connect>
         <!-- same as burst-on-connect, but this allows for being more
              specific on how much to burst. Most people won't need to
              change from the default 64k. Applies to all mountpoints  -->
@@ -34,7 +24,7 @@
 
     <authentication>
         <!-- Sources log in with username 'source' -->
-        <source-password>hackme</source-password>
+        <source-password>hogghall</source-password>
         <!-- Relays log in with username 'relay' -->
         <relay-password>hackme</relay-password>
 
@@ -98,32 +88,20 @@
         <mount>/example.ogg</mount>
         <local-mount>/different.ogg</local-mount>
         <on-demand>0</on-demand>
-
         <relay-shoutcast-metadata>0</relay-shoutcast-metadata>
     </relay>
     -->
-
-
     <!-- Mountpoints
          Only define <mount> sections if you want to use advanced options,
          like alternative usernames or passwords
     -->
 
-    <!-- Default settings for all mounts that don't have a specific <mount type="normal">.
-    -->
-    <!-- 
     <mount type="default">
-        <public>0</public>
-        <intro>/server-wide-intro.ogg</intro>
-        <max-listener-duration>3600</max-listener-duration>
         <authentication type="url">
-                <option name="mount_add" value="http://auth.example.org/stream_start.php"/>
+                <option name="stream_auth" value="http://auth/auth_icecast"/>
+                <option name="auth_header" value="icecast-auth-user: 1"/>
         </authentication>
-        <http-headers>
-                <header name="foo" value="bar" />
-        </http-headers>
     </mount>
-    -->
 
     <!-- Normal mounts -->
     <!--
@@ -178,8 +156,8 @@
         <!-- Note that if <chroot> is turned on below, these paths must both
              be relative to the new root, not the original root -->
         <logdir>/var/log/icecast2</logdir>
-        <webroot>/usr/share/icecast2/web</webroot>
-        <adminroot>/usr/share/icecast2/admin</adminroot>
+        <webroot>/usr/share/icecast/web</webroot>
+        <adminroot>/usr/share/icecast/admin</adminroot>
         <!-- <pidfile>/usr/share/icecast2/icecast.pid</pidfile> -->
 
         <!-- Aliases: treat requests for 'source' path as being for 'dest' path
@@ -221,203 +199,4 @@
             <group>icecast</group>
         </changeowner>
     </security>
-	
-	<mount>
-		<mount-name>test-show</mount-name>
-		<username>source</username>
-		<password>YHGEL</password>
-		<max-listeners>10</max-listeners>
-	</mount>
-    <mount>
-	<mount-name>/license-to-chill</mount-name>
-	<username>source</username>
-	<password>LUXDU</password>
-	<max-listeners>10</max-listeners>
-    </mount>
-    <mount>
-	<mount-name>/shock-me-like-an-electric-neil</mount-name>
-	<username>source</username>
-	<password>TYMBA</password>
-	<max-listeners>10</max-listeners>
-    </mount>
-    <mount>
-	<mount-name>/off-the-goop</mount-name>
-	<username>source</username>
-	<password>CSPRO</password>
-	<max-listeners>10</max-listeners>
-    </mount>
-    <mount>
-	<mount-name>/pb-jams</mount-name>
-	<username>source</username>
-	<password>JOJHB</password>
-	<max-listeners>10</max-listeners>
-    </mount>
-    <mount>
-	<mount-name>/the-chillabuster</mount-name>
-	<username>source</username>
-	<password>BEHLL</password>
-	<max-listeners>10</max-listeners>
-    </mount>
-    <mount>
-	<mount-name>/the-friday-night-funktion-show</mount-name>
-	<username>source</username>
-	<password>PKMMO</password>
-	<max-listeners>10</max-listeners>
-    </mount>
-    <mount>
-	<mount-name>/ska-sunrise</mount-name>
-	<username>source</username>
-	<password>ZCLWL</password>
-	<max-listeners>10</max-listeners>
-    </mount>
-    <mount>
-	<mount-name>/casstastrophe</mount-name>
-	<username>source</username>
-	<password>UMSNZ</password>
-	<max-listeners>10</max-listeners>
-    </mount>
-    <mount>
-	<mount-name>/good-ear-noises</mount-name>
-	<username>source</username>
-	<password>TSQID</password>
-	<max-listeners>10</max-listeners>
-    </mount>
-    <mount>
-	<mount-name>/something-light</mount-name>
-	<username>source</username>
-	<password>BEFCU</password>
-	<max-listeners>10</max-listeners>
-    </mount>
-    <mount>
-	<mount-name>/for-sure-100</mount-name>
-	<username>source</username>
-	<password>JAXOG</password>
-	<max-listeners>10</max-listeners>
-    </mount>
-    <mount>
-	<mount-name>/black-coffee</mount-name>
-	<username>source</username>
-	<password>UQPKY</password>
-	<max-listeners>10</max-listeners>
-    </mount>
-    <mount>
-	<mount-name>/simps-for-dua-lipa-discussion-hour</mount-name>
-	<username>source</username>
-	<password>TAWNL</password>
-	<max-listeners>10</max-listeners>
-    </mount>
-    <mount>
-	<mount-name>/sounds-like-nonsense</mount-name>
-	<username>source</username>
-	<password>DUATV</password>
-	<max-listeners>10</max-listeners>
-    </mount>
-    <mount>
-	<mount-name>/the-night-show</mount-name>
-	<username>source</username>
-	<password>QTHII</password>
-	<max-listeners>10</max-listeners>
-    </mount>
-    <mount>
-	<mount-name>/good-tunes--more-like-tood-gunes</mount-name>
-	<username>source</username>
-	<password>BVOZV</password>
-	<max-listeners>10</max-listeners>
-    </mount>
-    <mount>
-	<mount-name>/the-variety-hour</mount-name>
-	<username>source</username>
-	<password>YBDQT</password>
-	<max-listeners>10</max-listeners>
-    </mount>
-    <mount>
-	<mount-name>/the-werkout</mount-name>
-	<username>source</username>
-	<password>TFNNQ</password>
-	<max-listeners>10</max-listeners>
-    </mount>
-    <mount>
-	<mount-name>/alt-rock-expedition</mount-name>
-	<username>source</username>
-	<password>KVZMZ</password>
-	<max-listeners>10</max-listeners>
-    </mount>
-    <mount>
-	<mount-name>/test-show</mount-name>
-	<username>source</username>
-	<password>YHGEL</password>
-	<max-listeners>10</max-listeners>
-    </mount>
-    <mount>
-	<mount-name>/yellow</mount-name>
-	<username>source</username>
-	<password>HPJIW</password>
-	<max-listeners>10</max-listeners>
-    </mount>
-    <mount>
-	<mount-name>/shelly-s-sets</mount-name>
-	<username>source</username>
-	<password>GIBTW</password>
-	<max-listeners>10</max-listeners>
-    </mount>
-    <mount>
-	<mount-name>/out-of-commission</mount-name>
-	<username>source</username>
-	<password>QBLLB</password>
-	<max-listeners>10</max-listeners>
-    </mount>
-    <mount>
-	<mount-name>/remixtape</mount-name>
-	<username>source</username>
-	<password>OSULH</password>
-	<max-listeners>10</max-listeners>
-    </mount>
-    <mount>
-	<mount-name>/teddy-and-yellow-s-radio-show</mount-name>
-	<username>source</username>
-	<password>HNOHC</password>
-	<max-listeners>10</max-listeners>
-    </mount>
-    <mount>
-	<mount-name>/southern-laf</mount-name>
-	<username>source</username>
-	<password>DJQOU</password>
-	<max-listeners>10</max-listeners>
-    </mount>
-    <mount>
-	<mount-name>/something-to-take-the-edge-off</mount-name>
-	<username>source</username>
-	<password>JEXPJ</password>
-	<max-listeners>10</max-listeners>
-    </mount>
-    <mount>
-	<mount-name>/waffling</mount-name>
-	<username>source</username>
-	<password>ZXGZW</password>
-	<max-listeners>10</max-listeners>
-    </mount>
-    <mount>
-	<mount-name>/don-t-assume-my-genre</mount-name>
-	<username>source</username>
-	<password>VWEFB</password>
-	<max-listeners>10</max-listeners>
-    </mount>
-    <mount>
-	<mount-name>/pass-the-aux</mount-name>
-	<username>source</username>
-	<password>NRWZE</password>
-	<max-listeners>10</max-listeners>
-    </mount>
-    <mount>
-	<mount-name>/your-mother-s-hip-hop</mount-name>
-	<username>source</username>
-	<password>ZWMOB</password>
-	<max-listeners>10</max-listeners>
-    </mount>
-    <mount>
-	<mount-name>/lance-s-laboratory</mount-name>
-	<username>source</username>
-	<password>ASZNR</password>
-	<max-listeners>10</max-listeners>
-    </mount>
 </icecast>

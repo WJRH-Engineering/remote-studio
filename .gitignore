@@ -5,6 +5,9 @@ liq/passwords.liq
 icecast/mounts.xml
 icecast/generated_config.xml
 
+init/__pycache__
+init/.pgpass
+
 secrets/
 
 data.csv
