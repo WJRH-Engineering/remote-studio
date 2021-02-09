@@ -4,8 +4,6 @@
 # -----------	
 # INIT SCRIPT
 # -----------	
-# The 
-#
 
 from telnetlib import Telnet
 from redis import Redis
@@ -16,9 +14,7 @@ import random
 
 import sql
 
-config = toml.load("./config.toml")
-print(config)
-
+config = toml.load("/etc/config.toml")
 
 def generate_password():
 	chars = string.ascii_uppercase 

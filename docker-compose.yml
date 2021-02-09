@@ -9,6 +9,7 @@ services:
     depends_on: [liquidsoap, redis, icecast]
     volumes:
       - "./init:/home/init/"
+      - "./init/config.toml:/etc/config.toml/"
       - "./secrets/.pgpass:/home/init/.pgpass"
 
 

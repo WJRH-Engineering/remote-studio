@@ -2,7 +2,7 @@
 
 # config
 import toml
-config = toml.load("./config.toml").get("database")
+config = toml.load("/etc/config.toml").get("database")
 
 import psycopg2 as pg
 
