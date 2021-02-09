@@ -11,8 +11,6 @@ services:
       - "./init:/home/init/"
       - "./init/config.toml:/etc/config.toml/"
       - "./secrets/.pgpass:/home/init/.pgpass"
-
-
   redis:
     image: redis:latest
     ports:
@@ -41,7 +39,9 @@ services:
     ports:
       - 8000:8000
     volumes:
-      - "./icecast/icecast.xml:/etc/icecast2/icecast.xml"
+      - "./icecast/web:/etc/icecast/web"
+      - "./icecast/admin:/etc/icecast/admin"
+      - "./icecast/icecast.xml:/etc/icecast/icecast.xml"
 
   liquidsoap:
     image: savonet/liquidsoap:master
