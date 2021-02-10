@@ -53,7 +53,7 @@ def get_schedule():
 def init_streaming_server():
 	print("connecting to liquidsoap")
 
-	server = Telnet('liquidsoap', 1234)
+	server = Telnet('scheduler', 1234)
 	redis = Redis('redis', 6379)
 
 	def write(command):
