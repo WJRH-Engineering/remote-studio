@@ -2,11 +2,11 @@ version: '3.0'
 services:
 
   # initialize the state of each container or reset the state of the system,
-  # specificially the liquidsoap and redis containers. Built from information
+  # specificially the scheduler and redis containers. Built from information
   # stored in the api.wjrh.org database
   init:
     build: ./init
-    depends_on: [liquidsoap, redis, icecast]
+    depends_on: [scheduler, redis, icecast]
     volumes:
       - "./init:/home/init/"
       - "./init/config.toml:/etc/config.toml/"
@@ -43,13 +43,13 @@ services:
       - "./icecast/admin:/etc/icecast/admin"
       - "./icecast/icecast.xml:/etc/icecast/icecast.xml"
 
-  liquidsoap:
+  scheduler:
     image: savonet/liquidsoap:master
     environment: ['TZ=America/New_York']
     volumes:
-      - "./liquidsoap/main.liq:/src/main.liq"
-      - "./liquidsoap/timestring.liq:/src/timestring.liq"
-      - "./liquidsoap/config.liq:/src/config.liq"
+      - "./scheduler/main.liq:/src/main.liq"
+      - "./scheduler/timestring.liq:/src/timestring.liq"
+      - "./scheduler/config.liq:/src/config.liq"
       - "./secrets:/secrets"
     command: ["/src/main.liq"]
     ports:
