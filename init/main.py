@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 
-
 # -----------	
 # INIT SCRIPT
 # -----------	
@@ -89,5 +88,3 @@ def init_streaming_server():
 
 setup_auth_table()
 init_streaming_server()
-
-
