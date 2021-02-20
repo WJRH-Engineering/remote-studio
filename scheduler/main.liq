@@ -20,13 +20,13 @@ set("server.telnet.bind_addr", "0.0.0.0")
 def stream_to(mount, source)
 	output.icecast(
 		%mp3, 
-		fallible=true,
+		# fallible=true,
 		host=config_get("output.server"), 
 		port=int_of_string(config_get("output.port")),
 		mount = mount,
 		id = mount,
 		password=icecast_password,
-		source
+		mksafe(source)
 	)
 end
 
@@ -34,7 +34,7 @@ end
 # workaround for this, we will create an icecast stream called "waiting" which
 # will play silence until the server starts. We will call shutdown on the
 # source in the start function
-waiting = stream_to("waiting", blank())
+heartbeat = stream_to("remote-studio.heartbeat", blank())
 
 # A mutable list of timeslots that can be modified with the add_timeslot
 # function. Once the start function is called, this list is used to generate
@@ -65,7 +65,6 @@ end
 def start()
 	output = switch(track_sensitive = false, list.map(make_source, !timeslots))
 	stream_to("remote-studio", output)
-	waiting.shutdown()
 	"OK"
 end
 
@@ -120,5 +119,5 @@ server.register("start", fun(argstring) -> start())
 
 # # uncomment these lines to manually add timeslots and start the server
 # add_timeslot("black-coffee", "5w0h-5w24h")
-add_timeslot("shock-me-like-an-electric-neil", "5w0h-6w24h")
+# add_timeslot("shock-me-like-an-electric-neil", "0w0h-7w24h")
 # start()
