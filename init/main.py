@@ -43,7 +43,7 @@ def get_schedule():
 	for timeslot in config.get("timeslot"):
 		timeslot['mountpoint'] = timeslot['shortname']
 		if not timeslot.get("password", None):
-			timeslot['password'] = sql.select("password", [timeslot.get("shortname")])
+			timeslot['password'] = sql.select("password", [timeslot.get("shortname")])[0].get("password")
 
 		output.append(timeslot)
 

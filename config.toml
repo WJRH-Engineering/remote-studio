@@ -18,8 +18,12 @@ auth_table = "mountpoints"
 shortname = "black-coffee"
 time_range = "1w0h-8w1h"
 
+[[timeslot]]
+shortname = "shock-me-like-an-electric-neil"
+time_range = "1w0h-7w24h"
+
 [liquidsoap]
-input_server = "api.wjrh.org"
+input_server = "icecast"
 input_port = 8000
 output_server = "api.wjrh.org"
 output_port = 8000
