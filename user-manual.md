@@ -1,27 +1,5 @@
----
 <!-- title: WJRH Remote Broadcasting Manual -->
 <!-- author: Connor Winiarczyk, Hayden Dodge -->
----
-
-<style>
-img {
-	width: 100%;
-}
-
-html{
-	font-family: sans-serif;
-}
-
-table {
-	border-collapse: collapse;
-}
-
-
-table, td, th {
-	border: 1px solid black;
-	padding: 0.5rem 1rem;
-}
-</style>
 
 <div style="display: flex; align-items: center; margin-bottom: 2rem;">
 <img src="http://localhost:5000/logo.png" style="width: 10rem;"></img>
