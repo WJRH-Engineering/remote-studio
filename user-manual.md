@@ -1,37 +1,9 @@
----
 <!-- title: WJRH Remote Broadcasting Manual -->
 <!-- author: Connor Winiarczyk, Hayden Dodge -->
----
 
-<style>
-img {
-	width: 100%;
-}
+# Remote Broadcasting Manual
 
-html{
-	font-family: sans-serif;
-}
-
-table {
-	border-collapse: collapse;
-}
-
-
-table, td, th {
-	border: 1px solid black;
-	padding: 0.5rem 1rem;
-}
-</style>
-
-<div style="display: flex; align-items: center; margin-bottom: 2rem;">
-<img src="http://localhost:5000/logo.png" style="width: 10rem;"></img>
-
-<div style="margin-left: 1rem;">
-	<h1>Remote Broadcasting Manual</h1>
-	<h3>Version 1.0</h3>
-</div>
-</div>
-
+### Connor Winiarczyk, Hayden Dodge
 
 WJRH is currently in the process of expanding its broadcasting infrastructure to include shows hosted remotely over the internet. The goal of this new system is to provide a way for live programming to continue during 2020 Coronavirus restrictions, as well as to provide more flexibility in the future for things like alumni shows, special events, and live programming during the College's breaks. This document provides instructions for setting up a remote broadcast, as well as a high level overview of how the system works.
 
