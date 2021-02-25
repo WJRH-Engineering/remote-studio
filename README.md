@@ -37,10 +37,12 @@ A key value store used exclusively by the Auth service to store show - password 
 
 A liquidsoap script that switches between streams on the Icecast server based on the current schedule. The scheduler is configured with a list of show - timeslot pairs, where each show is a mountpoint on the Icecast server, and each timeslot is a string representing two times of the week, between which the show should play.
 
-Immediately after the scheduler starts, it starts a telnet server which can be used to configure it. 
+Immediately after the scheduler starts, it enters a setup state where it listens for configuration messages over telnet. In this state, an external script or administrator can add timeslots with the `timeslot.add` command, set configuration variables with the `config.set` command, or otherwise modify the script's behavior. Once the scheduler has been configured, the `start` command can be used to put it into an active state, where it locks in its settings and starts listening for shows and streaming. Once in the active state, the scheduler can only be modified by resetting it and re-sending the configuration commands. 
 
 - Init
 
-## Getting Started
+A python script that runs after the rest of the services have started. It is responsible for collecting data about the schedule and using it to configure the other services. Currently it sends show and password data to the auth service, timeslot data and configuration settings to the scheduler, and the start signal responsible for putting the scheduler in the active state. 
 
-It is relatively straitforward to run your own instance of Remote Studio
+## Running an Instance
+
+It is relatively straightforward to run your own instance of Remote Studio, which can be useful for debugging or trying out new features. It requires only a computer with docker and docker-compose installed, and the ports 8000 and 1935 available. The included `docker-compose.yml` file is built for testing on a local machine, and can be run with the commands `sudo docker-compose up` and `sudo docker-compose down`.
