@@ -1,8 +1,8 @@
 # toml file for general configuration of the streaming server
 
 [schedule]
-year = 2020
-season = "FALL"
+year = 2021
+season = "SPRING"
 
 [database]
 hostname = "api.wjrh.org"
