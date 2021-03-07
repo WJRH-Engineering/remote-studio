@@ -18,7 +18,17 @@ from pprint import pprint as print
 
 def get_passwords(schedule):
 	programs = [program for program, time_range in schedule]
-	get_password = lambda program: sql.select("password", [program])[0].get("password")
+
+	def get_password(program):
+		result = sql.select("password", [program])
+
+		# Handle case where password isn't set
+		if len(result) == 0:
+			print(f"WARNING: empty password for {program}, consider generating one")
+			return "" # just use an empty string for undefined passwords
+
+		return result[0].get("password")
+
 	return [(program, get_password(program)) for program in programs]
 
 def get_schedule(year, season):
@@ -96,5 +106,5 @@ if __name__ == "__main__":
 	schedule = get_schedule(year, season)
 	passwords = get_passwords(schedule)
 
-	init_scheduler(schedule, options = config.get("scheduler"))
-	init_auth_server(passwords)
+	# init_scheduler(schedule, options = config.get("scheduler"))
+	# init_auth_server(passwords)

@@ -3,11 +3,9 @@ RUN pip install psycopg2
 RUN pip install redis
 RUN pip install toml
 
-RUN whoami
 RUN useradd init
 USER init
-workdir /home/init
-run whoami
+workdir /home/init/src
 
 # scripts are mounted as volumes for developoment
 

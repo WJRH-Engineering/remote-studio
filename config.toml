@@ -15,12 +15,12 @@ auth_table = "mountpoints"
 # Add extra timeslots here
 
 [[timeslot]]
-shortname = "black-coffee"
+shortname = "connors-cool-show"
 time_range = "1w0h-8w1h"
 
-[[timeslot]]
-shortname = "shock-me-like-an-electric-neil"
-time_range = "1w0h-7w24h"
+# [[timeslot]]
+# shortname = "shock-me-like-an-electric-neil"
+# time_range = "1w0h-7w24h"
 
 [scheduler]
 input.server = "icecast"

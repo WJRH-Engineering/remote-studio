@@ -8,7 +8,7 @@ services:
     build: ./init
     depends_on: [scheduler, redis, icecast]
     volumes:
-      - "./init:/home/init/"
+      - "./init:/home/init/src/"
       - "./config.toml:/etc/config.toml/"
       - "./secrets/.pgpass:/home/init/.pgpass"
   redis:
