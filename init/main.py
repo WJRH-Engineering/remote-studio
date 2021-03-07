@@ -14,8 +14,6 @@ import sql
 import config_loader
 config = config_loader.get_config()
 
-from pprint import pprint as print
-
 def get_passwords(schedule):
 	programs = [program for program, time_range in schedule]
 

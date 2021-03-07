@@ -8,9 +8,9 @@ services:
     build: ./init
     depends_on: [scheduler, redis, icecast]
     volumes:
-      - "./init:/home/init/src/"
+      - "./init:/home/wjrh/src"
       - "./config.toml:/etc/config.toml/"
-      - "./secrets/.pgpass:/home/init/.pgpass"
+        #- "./secrets/.pgpass:/home/wjrh/.pgpass"
   redis:
     image: redis:latest
     ports:
