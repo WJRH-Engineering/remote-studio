@@ -7,7 +7,7 @@ season = "FALL"
 [database]
 hostname = "api.wjrh.org"
 port = 5432
-database = "testdb"
+database = "production"
 user = "wjrh"
 schedule_table = "schedule"
 auth_table = "mountpoints"
@@ -22,8 +22,8 @@ time_range = "1w0h-8w1h"
 shortname = "shock-me-like-an-electric-neil"
 time_range = "1w0h-7w24h"
 
-[liquidsoap]
-input_server = "icecast"
-input_port = 8000
-output_server = "api.wjrh.org"
-output_port = 8000
+[scheduler]
+input.server = "icecast"
+input.port = 8000
+output.server = "api.wjrh.org"
+output.port = 8000

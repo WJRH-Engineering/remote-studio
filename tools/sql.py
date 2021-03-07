@@ -2,9 +2,11 @@
 
 # config
 config = {
-    "user": "wjrh",
-    "database": "testdb",
-    "hostname": "api.wjrh.org",
+	"user": "wjrh",
+	"database": "production",
+	"hostname": "api.wjrh.org",
+	"schedule_table": "schedule",
+	"auth_table": "mountpoints",
 }
 
 import psycopg2 as pg
@@ -16,30 +18,31 @@ cursor = conn.cursor()
 # schema defenitions correspond to select statements defined below, not
 # necessarily to tables in the database
 schema = {
-	"mounts":   ["shortname", "password", "mountpoint"],
+	"auth":   ["id", "shortname", "password", "mountpoint"],
 	"schedule": ["shortname", "time_range", "year", "season", "mountpoint", "password"],
 	"password": ["password"],
+	"streamkeys": ["shortname", "password"],
 }
 selects = {
-	"mounts":
-	"""
-	SELECT *
-	FROM mounts
+	"auth":
+	f"""
+	SELECT id, shortname, password, mountpoint
+	FROM {config.get("auth_table")};
 	""",
 
 	"password":
-	"""
+	f"""
 	SELECT password
-	FROM mounts
+	FROM {config.get("auth_table")}
 	WHERE shortname = %s;
 	""",
 
 	"schedule":
-	"""
+	f"""
 	SELECT schedule.shortname, time_range, year, season, mountpoint, password
-	FROM schedule
-	LEFT JOIN mounts
-	ON schedule.shortname = mounts.shortname
+	FROM {config.get("schedule_table")}
+	LEFT JOIN {config.get("auth_table")}
+	ON {config.get("schedule_table")}.shortname = {config.get("auth_table")}.shortname
 	WHERE year = %s AND season = %s;
 	"""
 }
@@ -48,31 +51,31 @@ updates = {
 	# Add a row to the mounts table for every unique shortname in the timeslots
 	# table
 	"autofill-shows":
-	"""
-	INSERT INTO mounts (shortname)
-	SELECT DISTINCT shortname FROM schedule
+	f"""
+	INSERT INTO {config.get("auth_table")} (shortname)
+	SELECT DISTINCT shortname FROM {config.get("schedule_table")}
 	ON CONFLICT DO NOTHING;
 	""",
 
 	"autofill-mountpoints":
-	"""
-	UPDATE mounts
+	f"""
+	UPDATE {config.get("auth_table")}
 	SET mountpoint = "shortname"
 	WHERE mountpoint IS NULL;
 	""",
 
 	"set-password":
-	"""
-	UPDATE mounts
+	f"""
+	UPDATE {config.get("auth_table")}
 	SET password = %s
 	WHERE shortname = %s;
 	""",
 
-    "insert-timeslot":
-    """
-    INSERT INTO schedule (shortname, time_range, year, season)
-    VALUES(%s, %s, %s, %s);
-    """
+	"insert-timeslot":
+	f"""
+	INSERT INTO {config.get("schedule_table")} (shortname, time_range, year, season)
+	VALUES(%s, %s, %s, %s);
+	"""
 }
 
 def select(table, args=[]):

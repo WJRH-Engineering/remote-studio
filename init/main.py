@@ -6,54 +6,46 @@
 
 from telnetlib import Telnet
 from redis import Redis
-
-import toml
 import string
 import random
 
 import sql
 
-config = toml.load("/etc/config.toml")
+import config_loader
+config = config_loader.get_config()
 
-def generate_password():
-	chars = string.ascii_uppercase 
-	size = 5
-	return ''.join(random.choice(chars) for x in range(0, size))
+from pprint import pprint as print
 
-def setup_auth_table():
-	sql.run("autofill-shows")
-	sql.run("autofill-mountpoints")
+def get_passwords(schedule):
+	programs = [program for program, time_range in schedule]
+	get_password = lambda program: sql.select("password", [program])[0].get("password")
+	return [(program, get_password(program)) for program in programs]
 
-	for row in sql.select("mounts"):
-		if row.get("password") == None:
-			print(f"generating password for {row.get('shortname')}")
-			sql.run("set-password", [generate_password(), row.get("shortname") ])
+def get_schedule(year, season):
+	# query schedule data from the database
+	rows = sql.select("schedule", [year, season])
 
+	# Reformat the result of the SQL query into one more manageable by this script
+	# converts list of dicts to list of tuples, removes unneeded columns, and 
+	# converts the time_range from postgres timerange syntax to that of liquidsoap
+	reformat_sql = lambda row: ( row["shortname"], sql.timestring(row["time_range"]) )
+	database_timeslots = [reformat_sql(row) for row in rows]
 
-def get_schedule():
-	# get the timeslots from the schedule table
-	season = config.get("schedule").get("season")
-	year = config.get("schedule").get("year")
-	output = sql.select("schedule", [year, season])
+	# Read additional schedule data from the config file. Virtually the same
+	# process, but no need to convert to timestring
+	reformat_config = lambda timeslot: (timeslot["shortname"], timeslot["time_range"])
+	manual_timeslots = [reformat_config(timeslot) for timeslot in config.get("timeslot", [])]
 
-	for timeslot in output:
-		timeslot["time_range"] = sql.timestring(timeslot["time_range"])
-
-	# add any extra timeslots that may be included in the config file
-	for timeslot in config.get("timeslot"):
-		timeslot['mountpoint'] = timeslot['shortname']
-		if not timeslot.get("password", None):
-			timeslot['password'] = sql.select("password", [timeslot.get("shortname")])[0].get("password")
-
-		output.append(timeslot)
-
+	output = database_timeslots + manual_timeslots
 	return output
 
-def init_streaming_server():
-	print("connecting to liquidsoap")
-
-	server = Telnet('scheduler', 1234)
-	redis = Redis('redis', 6379)
+def init_scheduler(schedule, options={}):
+	print("connecting to scheduler telnet server...")
+	try:
+		server = Telnet('scheduler', 1234)
+	except Exception:
+		print("failed to connect to to telnet server, exiting")
+		return
 
 	def write(command):
 		server.write(command.encode('utf-8'))
@@ -64,27 +56,45 @@ def init_streaming_server():
 		server.write(b"exit\n")
 		server.read_until(b"Bye!")
 		server.close()
-	
-	def setpassword(shortname, password):
-		redis.sadd('auth-tokens', '{}:{}'.format(shortname, password))
 
-	for timeslot in get_schedule():
-		timestring = timeslot.get("time_range")
-		write(f'timeslot.add {timeslot.get("mountpoint")} {timestring}')
-		setpassword(timeslot.get("shortname"), timeslot.get("password"))
-
-	# send config commands
-	liquidsoap = config.get("liquidsoap")
-	write(f"config.set input.server {liquidsoap.get('input_server')}")
-	write(f"config.set input.port {liquidsoap.get('input_port')}")
-	write(f"config.set output.server {liquidsoap.get('output_server')}")
-	write(f"config.set output.port {liquidsoap.get('output_port')}")
+	print("connected, adding timeslots")
+	for program, timestring in schedule:
+		print(f'adding timeslot: {program} @ {timestring}')
+		write(f'timeslot.add {program} {timestring}')
 
 	print("finished adding timeslots")
+	print()
+
+	print("sending custom config settings")
+	# send config commands
+	for key, value in options.items():
+		print(f"setting {key} to {value}")
+		write(f"config.set key value")
+
+	print("finished config")
 	print("sending start signal")
 	write('start')
 	close()
 	print("connection closed")
+	print()
 
-setup_auth_table()
-init_streaming_server()
+def init_auth_server(passwords):
+	try:
+		redis = Redis('redis', 6379)
+	except Exception:
+		print("failed to connect to to redis, exiting")
+		return
+
+	for shortname, password in passwords:
+		redis.sadd(f'auth-tokens', f'{shortname}:{password}')
+
+
+if __name__ == "__main__":
+	year = config.get("schedule").get("year")
+	season = config.get("schedule").get("season")
+
+	schedule = get_schedule(year, season)
+	passwords = get_passwords(schedule)
+
+	init_scheduler(schedule, options = config.get("scheduler"))
+	init_auth_server(passwords)

@@ -17,7 +17,7 @@ def parse_line(line):
 	Each line contains the name of the show and its timeslot, separated by an
 	@ sign and any amount of whitespace.
 	"""
-	pattern = '(.+)\s*@\s*(.+)'
+	pattern = '(\S+?)\s*@\s*(.+)'
 	match = re.match(pattern, line)
 	return (match.group(1), match.group(2))
 
