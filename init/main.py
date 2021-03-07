@@ -104,5 +104,5 @@ if __name__ == "__main__":
 	schedule = get_schedule(year, season)
 	passwords = get_passwords(schedule)
 
-	# init_scheduler(schedule, options = config.get("scheduler"))
-	# init_auth_server(passwords)
+	init_scheduler(schedule, options = config.get("scheduler"))
+	init_auth_server(passwords)
