@@ -43,7 +43,7 @@ Immediately after the scheduler starts, it enters a setup state where it listens
 
 ### Init
 
-A python script that runs after the rest of the services have started. It is responsible for collecting data about the schedule and using it to configure the other services. Currently it sends show and password data to the auth service, timeslot data and configuration settings to the scheduler, and the start signal responsible for putting the scheduler in the active state. 
+A python script that runs after the rest of the services have started. It is responsible for collecting data about the schedule and using it to configure the other services. Currently it sends show and password data to the auth service, timeslot data and configuration settings to the scheduler, and the start signal responsible for putting the scheduler into the active state. Users interested in modifying Remote Studio's behavior beyond what is possible with the config file alone should consider writing a custom init script.
 
 ## Running an Instance
 
