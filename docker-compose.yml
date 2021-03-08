@@ -14,7 +14,7 @@ services:
   redis:
     image: redis:latest
     ports:
-      - 6379:6379
+      - 127.0.0.1:6379:6379
 
   # the auth service is a nodejs/express web app responsible for authorizing
   # publish requests to the rtmp server
@@ -35,8 +35,8 @@ services:
 
   # the icecast server
   icecast:
-    #image: api.wjrh.org:5000/icecast:latest
-    image: infiniteproject/icecast:latest
+    image: api.wjrh.org:5000/icecast:latest
+    #image: infiniteproject/icecast:latest
     ports:
       - 8000:8000
     volumes:

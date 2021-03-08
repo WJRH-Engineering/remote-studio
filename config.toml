@@ -23,7 +23,7 @@ shortname = "shock-me-like-an-electric-neil"
 time_range = "1w0h-7w24h"
 
 [scheduler]
-input.server = "icecast"
-input.port = 8000
-output.server = "api.wjrh.org"
-output.port = 8000
+"input.server" = "icecast"
+"input.port" = 8000
+"output.server" = "api.wjrh.org"
+"output.port" = 8000

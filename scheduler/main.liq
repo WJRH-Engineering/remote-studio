@@ -56,6 +56,7 @@ end
 def make_source(timeslot)
 	url = "http://#{config_get('input.server')}:#{config_get('input.port')}/#{fst(timeslot)}"
 	source = input.http(id=fst(timeslot), url)
+	source = map_metadata(fun(m) -> [("title", "#{fst(timeslot)} - WJRH Remote Studio")], source)
 	predicate = timerange_to_function(snd(timeslot))
 	(predicate, source)
 end
