@@ -2,6 +2,8 @@ use tide;
 use std::collections::HashMap;
 use tide::Response;
 
+use std::sync::{Arc, Mutex};
+
 #[derive(Clone, PartialEq, Debug)]
 pub enum State {
     Init, Setup, Live,
@@ -10,6 +12,17 @@ pub enum State {
 #[derive(Clone, PartialEq, Debug)]
 pub enum Signal {
     EnterSetup, EnterLive, Reset,
+}
+
+impl Signal {
+    pub fn from_str(input: &str) -> Result<Self, String> {
+        match input.to_uppercase().as_str() {
+            "SETUP" | "ENTERSETUP" => Ok(Self::EnterSetup),
+            "LIVE" | "ENTERLIVE" => Ok(Self::EnterLive),
+            "RESET" => Ok(Self::Reset),
+            _ => Err(format!("Could not parse: {}", input)),
+        }
+    }
 }
 
 use Signal::*;
@@ -115,7 +128,9 @@ mod routes {
     use super::*;
 
     pub async fn debug(request: Request) -> tide::Result {
-        let state = request.state();
+        let mut state = request.state().lock().unwrap();
+
+        state.update_state(Signal::EnterSetup);
         let table = format!("{:?}", state);
 
         let response = Response::builder(200)
@@ -128,17 +143,16 @@ mod routes {
     pub async fn send_signal(request: Request) -> tide::Result {
 
         let signal_str = request.param("signal")?;
-        let signal = match signal_str.to_uppercase().as_str() {
-            "SETUP" => Signal::EnterSetup,
-            "LIVE"  => Signal::EnterLive,
-            "RESET" => Signal::Reset,
-            _ => todo!(),
-        };
+        let signal = Signal::from_str(&signal_str).unwrap();
 
-        let server = request.state();
+        let mut server = request.state().lock().unwrap();
         let result = server.update_state(signal);
 
-        todo!();
+        let response = Response::builder(200)
+            .body(format!("{:?}", server.state))
+            .build();
+
+        Ok(response)
     }
 }
 
@@ -147,12 +161,14 @@ async fn router(mut request: Request) -> tide::Result {
     Ok(Response::builder(200).build())
 }
 
-type Request = tide::Request<AuthServer>;
+type ServerState = Arc<Mutex<AuthServer>>;
+type Request = tide::Request<ServerState>;
 
 #[async_std::main]
 async fn main() {
     let mut auth_server = AuthServer::new();
-    let mut http = tide::with_state(auth_server);
+    let server_state = Arc::new(Mutex::new(auth_server));
+    let mut http = tide::with_state(server_state);
 
     // define http routes
     http.at("/auth/rtmp").get(router);
