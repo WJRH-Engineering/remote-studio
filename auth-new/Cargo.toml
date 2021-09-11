@@ -9,3 +9,4 @@ edition = "2018"
 tide="0.16.0"
 clap="2.33"
 async-std={version="1.6.2", features=["attributes"]}
+serde="^1"

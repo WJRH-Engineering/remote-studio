@@ -154,6 +154,43 @@ mod routes {
 
         Ok(response)
     }
+
+    use tide::prelude::*;
+
+    /// Expected input to the `register` http route. This should be attached as JSON in the request
+    /// body
+    #[derive(Deserialize, Debug)]
+    struct RegisterInput {
+        username: String,
+        password: String,
+    }
+
+    pub async fn register(mut request: Request) -> tide::Result {
+
+        let input: RegisterInput = request.body_json().await.unwrap();
+        let mut server = request.state().lock().unwrap();
+        let result = server.register(&input.username, &input.password);
+
+        if let Err(e) = result {
+            return Ok(Response::builder(400).body("not allowed").build());
+        }
+
+        Ok(Response::builder(200).build())
+    }
+
+    pub async fn auth(mut request: Request) -> tide::Result {
+        let input: RegisterInput = request.body_json().await.unwrap();
+        let server = request.state().lock().unwrap();
+
+        let result = server.authenticate(&input.username, &input.password).unwrap_or(false);
+
+        let output = match result {
+            true  => Response::builder(200).build(),
+            false => Response::builder(418).build(),
+        };
+
+        Ok(output)
+    }
 }
 
 
@@ -173,7 +210,9 @@ async fn main() {
     // define http routes
     http.at("/auth/rtmp").get(router);
 
+    http.at("/auth").post(routes::auth);
     http.at("/ctl/*signal").post(routes::send_signal);
+    http.at("/register").post(routes::register);
     http.at("/debug").get(routes::debug);
 
     let result = http.listen("0.0.0.0:4000").await;
