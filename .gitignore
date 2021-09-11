@@ -13,4 +13,4 @@ secrets/
 data.csv
 passwords.csv
 
-auth-new/target
+**/target

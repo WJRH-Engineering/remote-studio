@@ -160,14 +160,18 @@ mod routes {
     /// Expected input to the `register` http route. This should be attached as JSON in the request
     /// body
     #[derive(Deserialize, Debug)]
-    struct RegisterInput {
+    struct AuthInput {
+
+        #[serde(alias = "name", alias = "mount")]
         username: String,
+
+        #[serde(alias = "pass")]
         password: String,
     }
 
     pub async fn register(mut request: Request) -> tide::Result {
 
-        let input: RegisterInput = request.body_json().await.unwrap();
+        let input: AuthInput = request.body_json().await.unwrap();
         let mut server = request.state().lock().unwrap();
         let result = server.register(&input.username, &input.password);
 
@@ -179,7 +183,7 @@ mod routes {
     }
 
     pub async fn auth(mut request: Request) -> tide::Result {
-        let input: RegisterInput = request.body_json().await.unwrap();
+        let input: AuthInput = request.body_json().await.unwrap();
         let server = request.state().lock().unwrap();
 
         let result = server.authenticate(&input.username, &input.password).unwrap_or(false);
@@ -191,8 +195,33 @@ mod routes {
 
         Ok(output)
     }
-}
 
+    pub async fn auth_rtmp(mut request: Request) -> tide::Result {
+        let input: AuthInput = request.body_json().await.unwrap();
+        let server = request.state().lock().unwrap();
+        let result = server.authenticate(&input.username, &input.password).unwrap_or(false);
+
+        let output = match result {
+            true => Response::builder(200).build(),
+            false => Response::builder(404).build(),
+        };
+
+        Ok(output)
+    }
+
+    pub async fn auth_icecast(mut request: Request) -> tide::Result {
+        let input: AuthInput = request.body_json().await.unwrap();
+        let server = request.state().lock().unwrap();
+        let result = server.authenticate(&input.username, &input.password).unwrap_or(false);
+
+        let output = match result {
+            true => Response::builder(200).build(),
+            false => Response::builder(404).build(),
+        };
+
+        Ok(output)
+    }
+}
 
 async fn router(mut request: Request) -> tide::Result {
     Ok(Response::builder(200).build())
@@ -207,10 +236,10 @@ async fn main() {
     let server_state = Arc::new(Mutex::new(auth_server));
     let mut http = tide::with_state(server_state);
 
-    // define http routes
-    http.at("/auth/rtmp").get(router);
-
     http.at("/auth").post(routes::auth);
+    http.at("/auth/rtmp").post(routes::auth_rtmp);
+    http.at("/auth/icecast").post(routes::auth_icecast);
+
     http.at("/ctl/*signal").post(routes::send_signal);
     http.at("/register").post(routes::register);
     http.at("/debug").get(routes::debug);
